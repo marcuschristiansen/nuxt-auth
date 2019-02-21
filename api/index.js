@@ -1,4 +1,6 @@
 const express = require('express')
+const graphqlHttp = require('express-graphql')
+const { buildSchema } = require('graphql')
 
 const router = express.Router()
 
@@ -11,10 +13,40 @@ router.use((req, res, next) => {
     next()
 })
 
-router.post('/test-endpoint', (req, res) => {
-    console.log('Stored Data!', req.body.data)
-    res.status(200).json({ message: 'Success!' })
-})
+// router.use('/graphql', (req, res) => {
+//     console.log('Stored Data!', req.body.data)
+//     res.status(200).json({ message: 'Success!' })
+// })
+
+router.use(
+    '/graphql', 
+    graphqlHttp({
+        schema: buildSchema(`
+            type RootQuery {
+                users: [String!]!
+            }
+
+            type RootMutation {
+                createUser(email: String): String
+            }
+
+            schema {
+                query: RootQuery
+                mutation: RootMutation
+            }
+        `),
+        rootValue: {
+            users: () => {
+                return ['Marcus', 'Meghnaaz', 'Vincent']
+            },
+            createUser: (args) => {
+                const userEmail = args.email
+                return userEmail
+            }
+        },
+        graphiql: true
+    })
+)
 
 module.exports = {
     path: '/api',
