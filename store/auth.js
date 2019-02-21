@@ -57,6 +57,7 @@ export const actions = {
         return new Promise ((resolve, reject) => {
             lock.on('authenticated', (authResult) => {
                 console.log(authResult)
+                console.log('This is just some random text')
                 lock.getUserInfo(authResult.accessToken, function (error, profile) {
                 if (error) {
                     localStorage.removeItem('accessToken');
